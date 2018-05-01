@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 PostEntry._ID,
                 PostEntry.COLUMN_NAME,
                 PostEntry.COLUMN_TAG,
+                PostEntry.COLUMN_DATE,
                 PostEntry.COLUMN_IMAGE};
         return new CursorLoader(this, PostEntry.CONTENT_URI, projection, null, null, null);
     }

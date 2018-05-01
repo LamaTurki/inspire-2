@@ -19,22 +19,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.inspire3.data.PostsContract.PostEntry;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        AdapterView.OnItemSelectedListener {
     Uri mUri;
     Bitmap mBitmap = null;
     EditText nameEditText;
-    EditText tagEditText;
     ImageView imageView;
+    Spinner spin;
+    ArrayAdapter aa;
     Button selectImageButton;
+    String tag;
+    String[] tags = {"Work", "Study", "Nature", "Food", "Sport", "Fashion"};
     private int PICK_IMAGE_REQUEST = 1;
     private boolean mDataHasChanged = false;
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
@@ -49,8 +58,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        spin = (Spinner) findViewById(R.id.spinner1);
+        spin.setOnItemSelectedListener(this);
+        aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, tags);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);
         nameEditText = (EditText) findViewById(R.id.edit_name);
-        tagEditText = (EditText) findViewById(R.id.edit_tag);
         imageView = (ImageView) findViewById(R.id.imageview);
         selectImageButton = (Button) findViewById(R.id.select_image_button);
         mUri = getIntent().getData();
@@ -75,7 +89,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
         nameEditText.setOnTouchListener(mTouchListener);
-        tagEditText.setOnTouchListener(mTouchListener);
+        spin.setOnTouchListener(mTouchListener);
         selectImageButton.setOnTouchListener(mTouchListener);
     }
 
@@ -121,8 +135,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private void saveItemAndfinish() {
         ContentValues values = new ContentValues();
         String name = nameEditText.getText().toString().trim();
-        String tag = tagEditText.getText().toString().trim();
-        if (mUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(tag)  && mBitmap == null)
+        String tag = spin.getSelectedItem().toString().trim();
+        if (mUri == null && TextUtils.isEmpty(name) && TextUtils.isEmpty(tag) && mBitmap == null)
             return;
         if (TextUtils.isEmpty(name)) {
             Toast.makeText(this, getString(R.string.missing_post_desc),
@@ -141,8 +155,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
         values.put(PostEntry.COLUMN_NAME, name);
         values.put(PostEntry.COLUMN_TAG, tag);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        values.put(PostEntry.COLUMN_DATE, dateFormat.format(date));
         if (mBitmap != null)
-        values.put(PostEntry.COLUMN_IMAGE, DbBitmapUtility.getBytes(mBitmap));
+            values.put(PostEntry.COLUMN_IMAGE, DbBitmapUtility.getBytes(mBitmap));
         if (mUri == null) {
             Uri newUri = getContentResolver().insert(PostEntry.CONTENT_URI, values);
             // Show a toast message depending on whether or not the insertion was successful
@@ -272,6 +289,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 PostEntry._ID,
                 PostEntry.COLUMN_NAME,
                 PostEntry.COLUMN_TAG,
+                PostEntry.COLUMN_DATE,
                 PostEntry.COLUMN_IMAGE};
         return new CursorLoader(this, mUri, projection, null, null, null);
     }
@@ -280,7 +298,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.moveToFirst()) {
             nameEditText.setText(data.getString(data.getColumnIndex(PostEntry.COLUMN_NAME)));
-            tagEditText.setText(data.getString(data.getColumnIndex(PostEntry.COLUMN_TAG)));
+            spin.setSelection(aa.getPosition(data.getString(data.getColumnIndex(PostEntry.COLUMN_TAG))));
             byte[] imageBytes = data.getBlob(data.getColumnIndex(PostEntry.COLUMN_IMAGE));
             if (imageBytes != null)
                 imageView.setImageBitmap(DbBitmapUtility.getImage(imageBytes));
@@ -290,7 +308,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         nameEditText.setText("");
-        tagEditText.setText("");
+        spin.setSelection(0);
         imageView.setImageResource(0);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        tag = adapterView.getItemAtPosition(i).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        tag = "Work";
     }
 }

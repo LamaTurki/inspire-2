@@ -22,6 +22,7 @@ public class PostsDbHelper extends SQLiteOpenHelper {
                 PostsContract.PostEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 PostsContract.PostEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 PostsContract.PostEntry.COLUMN_TAG + " TEXT NOT NULL , " +
+                PostsContract.PostEntry.COLUMN_DATE + " DATE default CURRENT_DATE , " +
                 PostsContract.PostEntry.COLUMN_IMAGE + " BLOB ); ";
         sqLiteDatabase.execSQL(CREATE_STATMENT);
     }

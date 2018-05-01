@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
  */
 
 public final class PostsContract {
-    public static final String CONTENT_AUTHORITY = "com.example.android.inventoryapp";
+    public static final String CONTENT_AUTHORITY = "com.example.android.inspire3";
     public static final Uri BASE_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_POSTS = "products";
 
@@ -21,6 +21,7 @@ public final class PostsContract {
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_NAME = "description";
         public static final String COLUMN_TAG = "tag";
+        public static final String COLUMN_DATE = "date_created";
         public static final String COLUMN_IMAGE = "image";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_URI, PATH_POSTS);
 

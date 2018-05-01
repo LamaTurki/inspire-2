@@ -11,7 +11,9 @@
     <ListView
         android:id="@+id/listview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 
     <TextView
         android:id="@+id/emptyview"
@@ -19,10 +21,12 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-light"
         android:paddingTop="8dp"
         android:text="@string/empty_view_text"
+        android:textAlignment="center"
         android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#A2AAB0" />
+        android:textColor="#A2AAB0"
+        android:textStyle="italic" />
 
 </RelativeLayout>
